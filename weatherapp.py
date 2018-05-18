@@ -8,25 +8,27 @@ import os
 
 app = Flask(__name__)
 
+# Setting the API keys as environment variables
 weatherapi_key = os.environ.get('WEATHERKEY') #'e526e55a3248008806ffe0f40b17e68d'
 timeapi_key = os.environ.get('TIMEKEY') #'MW80T0GA7P7A'
-print(weatherapi_key, timeapi_key)
 
+# The main function for query, get response and show results 
 @app.route('/weather', methods=['GET', 'POST'])
 def get_weather():
+
 	if request.method == 'POST':
 		city_name = request.form.get('city').title()
 		city = quote(city_name)
 		url = 'https://api.openweathermap.org/data/2.5/weather?q={query}&APPID={appid}&units=metric'.format(appid=weatherapi_key, query=city)
-		print(url)
+		
 		response = requests.get(url)
 		if response.status_code == 404:
 			x = response.json()
-			return x.get('message', 'sua irma')
+			return x.get('message')
 
 		if response.status_code != 200:
 			print(response.status_code, response.content)
-			return "ERRO NÃO 200!"
+			return "ERROR NON 200!"
 				
 		weather = response.json()
 		print(weather)
@@ -55,9 +57,9 @@ def get_weather():
 		localtime = localtime[1]
 		#jdsguks
 		#return render_template('response.html', city=city, country=country_name, localtime=localtime, curr_temp=curr_temp, min_temp=min_temp, max_temp=max_temp)
-		return '<h1>{}</h1></br><h2>País: {}</h2></br><h2>Horário Local: {}</h2></br><h2>Temperatura Atual: {}°C</h2></br><h2>Temperatura Mínima: {}°C</h2></br><h2>Temperatura Máxima: {}°C</h2>'.format(city_name, country_name, localtime, curr_temp, min_temp, max_temp)
+		return '<h1>{}</h1></br><h2>Country: {}</h2></br><h2>Local Time: {}</h2></br><h2>Current Temperature: {}°C</h2></br><h2>Minimum Temperature: {}°C</h2></br><h2>Maximum Temperature: {}°C</h2>'.format(city_name, country_name, localtime, curr_temp, min_temp, max_temp)
 
-	return '<form method="POST"> Digite o nome de uma cidade em inglês: <input type="text" name="city"></br></br><input type="submit" value="Submit"></br></form>'
+	return '<form method="POST"> Type the city name: <input type="text" name="city"></br></br><input type="submit" value="Submit"></br></form>'
 
 if __name__ == "__main__":
-	app.run(debug=True, host='192.168.69.186', port='21180')
+	app.run(port='21180')
